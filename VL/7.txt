@@ -1,0 +1,24 @@
+7(b) PowerShell – Minimal Commands  
+
+Get-VMSwitch
+
+New-VM -Name "VM1" -MemoryStartupBytes 1GB -Generation 2 -NewVHDPath "C:\Hyper-V\VM1.vhdx" -NewVHDSizeBytes 20GB
+
+
+Get-VM
+
+
+Connect-VMNetworkAdapter -VMName "VM1" -SwitchName "Default Switch"
+
+Connect-VMNetworkAdapter -VMName "VM1" -SwitchName "Intel(R) Ethernet Connection (2) I219-LM - Virtual Switch"
+
+
+Add-VMDvdDrive -VMName "VM1" -Path "C:\Path\Ubuntu.iso"
+
+Add-VMDvdDrive -VMName "VM1" -Path "C:\ubuntu-version-desktop-amd64.iso"
+
+Start-VM -Name "VM1"
+
+Get-VM -Name "VM1"
+
+Stop-VM -Name "VM1"

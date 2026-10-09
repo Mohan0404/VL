@@ -1,0 +1,58 @@
+sudo apt update
+
+sudo apt install git   or   sudo apt install -y git python3-pip
+
+sudo useradd -s /bin/bash -d /opt/stack -m stack
+
+echo "stack ALL=(ALL) NOPASSWD: ALL" | sudo tee /etc/sudoers.d/stack
+
+sudo usermod -aG sudo stack
+
+sudo passwd -d stack
+
+sudo chown -R stack:stack /opt/stack
+
+sudo su - stack
+
+git clone https://opendev.org/openstack/devstack
+
+
+cd devstack
+
+nano local.conf
+
+put conf for ex: 
+[[local|localrc]]
+ADMIN_PASSWORD=admin
+DATABASE_PASSWORD=admin
+RABBIT_PASSWORD=admin
+SERVICE_PASSWORD=admin
+
+
+./stack.sh
+
+
+source openrc admin admin
+
+openstack image list
+
+
+openstack flavor list
+
+
+openstack keypair create mykey > mykey.pem
+
+chmod 600 mykey.pem
+
+
+openstack network list
+
+
+openstack server create --image <image_name_or_id> --flavor <flavor_name_or_id> --nic net-id=<network_id> --key-name mykey my-first-vm
+
+openstack server list
+
+ssh -i mykey.pem cirros@<vm_public_ip>
+
+
+
