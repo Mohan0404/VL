@@ -1,0 +1,109 @@
+Press Win + R, type diskmgmt.msc, and press Enter
+
+In Disk Management, go to the Action menu → Create VHD
+
+Location → Browse and select where to save the .vhd or .vhdx file.
+
+Virtual Hard Disk Size (decide based on what you need).
+
+VHD format:VHD (compatible with older systems, max 2TB).
+
+Type: Fixed size → Pre-allocates the full size. Faster runtime, but uses disk
+space upfront.
+
+Dynamically expanding → Grows as data is added. Saves space initially.
+
+Click OK → The VHD will be created and appear in Disk Management as
+"Not Initialized"
+
+Right-click the new disk → Initialize Disk.
+
+Create a new volume: Right-click unallocated space → New Simple Volume
+
+Assign a drive letter → Format (NTFS recommended).
+
+Now you can use it like a normal drive.
+
+10 b) Steps to Use on Another Host
+
+Copy your .vhd or .vhdx file to the new machine (via external HDD,
+network, or cloud).
+
+On the new host:Open Disk Management → Action → Attach VHD.
+
+Browse to the .vhd file and click OK.
+
+The VHD will appear as a new drive (with the same partitions/data).
+
+If needed, assign a drive letter:Right-click the partition → Change Drive
+Letter and Paths → Assign a letter.
+
+Now you can access files just like a normal disk.
+
+
+STORAGE VIRTUALIZATION:
+
+Step 1: Create a VM and Add Additional Storage
+-> Create a Linux VM
+
+ Open VirtualBox → Click New → Enter VM Name, Type = Linux,
+Version = ubuntu.
+ Allocate RAM (e.g., 2–4 GB).
+ Hard Disk: Select “Use an existing virtual hard disk file”.
+ Browse and select your VDI file.
+ Click Finish.
+
+Add an Additional Virtual Disk
+ This disk will be used for extending storage via LVM.
+ In VirtualBox:
+1. Select the VM → Settings → Storage.
+2. Click the Controller: SATA → Add Hard Disk → Create New Disk.
+3. Choose VDI (VirtualBox Disk Image), Dynamically allocated,size = 7 GB.
+4. Click Finish.
+
+Step 2: Start the VM and Login as Root sudo -s/ sudo -I
+
+Step 3: Check Existing Disks and LVM
+
+# List all disks
+fdisk -l
+
+# List physical volumes
+pvdisplay
+
+# List volume groups
+vgdisplay
+
+# List logical volumes
+lvdisplay
+
+Step 4: Create Physical Volume
+pvcreate /dev/sdb
+
+Initializes the new disk for LVM.
+
+Step 5: Extend the Volume Group
+vgextend ubuntu-vg /dev/sdb
+
+Replace cloud-vg with your existing Volume Group name.
+This adds the new PV to your VG.
+
+Step 6: Extend the Logical Volume (Root)
+lvresize --size +3G /dev/ubuntu-vg/root
+ +3G → amount of space to add
+ /dev/cloud-vg/root → your logical volume
+
+Alternative:
+lvextend -L +3G /dev/ubuntu-vg/root
+
+Step 7: Check Current Disk Usage
+df -h
+Shows current available space on /.
+
+Step 8: Resize the Filesystem
+resize2fs /dev/mapper/cloud--vg-root
+Resizes the filesystem to use the newly added space.
+
+Step 9: Verify Disk Space
+df -h
+Confirm that the root filesystem now has additional 3 GB.
